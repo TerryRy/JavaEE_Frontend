@@ -21,8 +21,33 @@
                 <el-button @click="runSearch" type="primary" style="margin-left: 25px; font-size: 15px">搜索</el-button>
             </div>
             <div id="element">
-                <el-avatar :size="40" :src="ava_src" style="margin-right: 20px"/>
-                <el-button @click="toCreate" type="primary" plain round style="font-size: 15px">
+                <el-popover
+                        popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+                >
+                    <template #reference>
+                        <el-avatar src="srcAva" />
+                    </template>
+                    <template #default>
+                        <div
+                                class="demo-rich-conent"
+                                style="display: flex; gap: 16px; flex-direction: column"
+                        >
+                            <p @click="toUserHome" style="display: flex; flex-direction: row; align-items: center">
+                                <el-icon style="margin-right: 5px"><House /></el-icon>
+                                个人主页
+                            </p>
+                            <p @click="toSetting" style="display: flex; flex-direction: row; align-items: center">
+                                <el-icon style="margin-right: 5px"><Setting /></el-icon>
+                                设置
+                            </p>
+                            <p @click="logOut" style="display: flex; flex-direction: row; align-items: center">
+                                <el-icon style="margin-right: 5px"><Delete /></el-icon>
+                                退出登录
+                            </p>
+                        </div>
+                    </template>
+                </el-popover>
+                <el-button @click="toCreate" type="primary" plain round style="font-size: 15px; margin-left: 45px">
                     <el-icon style="margin-right: 3px"><CirclePlus /></el-icon>
                     发布
                 </el-button>
@@ -33,7 +58,7 @@
 
 <script>
 import router from "@/router";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 
 export default {
     name: 'HeadBar',
@@ -41,24 +66,53 @@ export default {
     setup() {
 
         const inputSearch = ref("")
+        const srcAva = ref("")
         const jumpHome = () => {
             router.push('/')
         }
         
         const runSearch = () => {
-            console.log("搜索：" + inputSearch.value);
+            // console.log("搜索：" + inputSearch.value);
             // TODO: add searching api
         }
 
         const toCreate = () => {
-            // router.push('/create')
+            // TODO: route
+            // router.push('/create');
         }
+
+        const toUserHome = () => {
+            // TODO: route
+            // router.push('/userHome');
+        }
+
+        const toSetting = () => {
+            // TODO: route
+            // router.push('/setting');
+        }
+
+        const logOut = () => {
+            // TODO: clear token
+            router.push('/login');
+        }
+
+        const getUserInfo = () => {
+            // TODO: get self info and update relevant data
+        }
+
+        onMounted(() => {
+            getUserInfo();
+        })
 
         return {
             inputSearch,
+            srcAva,
             jumpHome,
             runSearch,
-            toCreate
+            toCreate,
+            toUserHome,
+            toSetting,
+            logOut
         }
     }
 };
