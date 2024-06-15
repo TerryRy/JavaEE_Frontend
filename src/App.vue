@@ -51,5 +51,6 @@ html, body {
 #mainBody {
   margin: 5px;
   padding: 5px;
+  flex-grow: 1;
 }
 </style>

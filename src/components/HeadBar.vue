@@ -25,7 +25,8 @@
                         popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
                 >
                     <template #reference>
-                        <el-avatar src="srcAva" />
+                        <el-avatar :size="35" style="font-size: 12px">{{ userName.substring(0, 2) }}</el-avatar>
+                        />
                     </template>
                     <template #default>
                         <div
@@ -66,7 +67,8 @@ export default {
     setup() {
 
         const inputSearch = ref("")
-        const srcAva = ref("")
+        // const srcAva = ref("https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png")
+        const userName = ref("暴走奶昔");
         const jumpHome = () => {
             router.push('/')
         }
@@ -82,22 +84,30 @@ export default {
         }
 
         const toUserHome = () => {
-            // TODO: route
-            // router.push('/userHome');
+            console.log("into toUserHome")
+            if (sessionStorage.getItem("token") === 'null') {
+                // no login
+                router.push('/login');
+            }
+            else {
+                router.push('/userHome');
+            }
         }
 
         const toSetting = () => {
-            // TODO: route
-            // router.push('/setting');
+            router.push('/setting');
         }
 
         const logOut = () => {
-            // TODO: clear token
+            sessionStorage.setItem("token", 'null');
             router.push('/login');
         }
 
         const getUserInfo = () => {
-            // TODO: get self info and update relevant data
+            if (!sessionStorage.getItem("token") === null) {
+                // no login
+                // TODO: get self info and update relevant data, maybe only srcAva
+            }
         }
 
         onMounted(() => {
@@ -106,7 +116,7 @@ export default {
 
         return {
             inputSearch,
-            srcAva,
+            userName,
             jumpHome,
             runSearch,
             toCreate,
