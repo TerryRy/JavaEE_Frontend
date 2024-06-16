@@ -25,7 +25,7 @@
                         popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
                 >
                     <template #reference>
-                        <el-avatar :size="35" style="font-size: 12px">{{ userName.substring(0, 2) }}</el-avatar>
+                        <el-avatar :size="35" style="font-size: 12px">{{ userNameAVA.substring(0, 2) }}</el-avatar>
                         />
                     </template>
                     <template #default>
@@ -36,10 +36,6 @@
                             <p @click="toUserHome" style="display: flex; flex-direction: row; align-items: center">
                                 <el-icon style="margin-right: 5px"><House /></el-icon>
                                 个人主页
-                            </p>
-                            <p @click="toSetting" style="display: flex; flex-direction: row; align-items: center">
-                                <el-icon style="margin-right: 5px"><Setting /></el-icon>
-                                设置
                             </p>
                             <p @click="logOut" style="display: flex; flex-direction: row; align-items: center">
                                 <el-icon style="margin-right: 5px"><Delete /></el-icon>
@@ -60,15 +56,24 @@
 <script>
 import router from "@/router";
 import {onMounted, ref} from "vue";
+import {mapState, useStore } from 'vuex';
+import axios from "axios";
+import {ElMessage} from "element-plus";
 
 export default {
     name: 'HeadBar',
+    computed: {
+        ...mapState(['userName_AVA']),
+        ...mapState(['articles'])
+        // 其他 computed properties
+    },
 
     setup() {
-
+        const store = useStore();
         const inputSearch = ref("")
         // const srcAva = ref("https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png")
         const userName = ref("暴走奶昔");
+        let userNameAVA = store.state.userName_AVA;
         const jumpHome = () => {
             router.push('/')
         }
@@ -76,6 +81,20 @@ export default {
         const runSearch = () => {
             // console.log("搜索：" + inputSearch.value);
             // TODO: add searching api
+            axios.post('/api/blog/searchBlog', {
+                tag: inputSearch.value
+            })
+                .then((response) => {
+                    if (response.data.code === 1) {
+                        store.state.articles = response.data.articles;
+                    }
+                    else {
+                        ElMessage({
+                            message: response.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
         }
 
         const toCreate = () => {
@@ -85,7 +104,7 @@ export default {
 
         const toUserHome = () => {
             console.log("into toUserHome")
-            if (sessionStorage.getItem("token") === 'null') {
+            if (window.sessionStorage.getItem("token") === 'null') {
                 // no login
                 router.push('/login');
             }
@@ -94,19 +113,15 @@ export default {
             }
         }
 
-        const toSetting = () => {
-            router.push('/setting');
-        }
-
         const logOut = () => {
-            sessionStorage.setItem("token", 'null');
+            window.sessionStorage.setItem("token", 'null');
+            store.state.userName_AVA = '';
             router.push('/login');
         }
 
         const getUserInfo = () => {
-            if (!sessionStorage.getItem("token") === null) {
-                // no login
-                // TODO: get self info and update relevant data, maybe only srcAva
+            if (!window.sessionStorage.getItem("token") === 'null') {
+                userNameAVA = store.state.userName_AVA;
             }
         }
 
@@ -117,11 +132,11 @@ export default {
         return {
             inputSearch,
             userName,
+            userNameAVA,
             jumpHome,
             runSearch,
             toCreate,
             toUserHome,
-            toSetting,
             logOut
         }
     }

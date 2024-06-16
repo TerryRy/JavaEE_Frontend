@@ -48,7 +48,7 @@
                 </el-input>
                 <div class="dialog-footer" style="margin-top: 10px; display: flex; flex-direction: row; justify-content: flex-end; align-items: flex-end">
                     <el-button @click="dialogVisible = false">Cancel</el-button>
-                    <el-button type="primary" @click="updateBaseInfo()">
+                    <el-button type="primary" @click="updateBaseInfo">
                         Confirm
                     </el-button>
                 </div>
@@ -183,14 +183,22 @@
 <script>
 import {onMounted, ref} from "vue";
 import {Edit} from '@element-plus/icons-vue'
-
+import axios from "axios";
+import {ElMessage} from "element-plus";
+import {mapState, useStore } from 'vuex';
+import router from "@/router";
 export default {
     name: "UserHome",
-
+    computed: {
+        ...mapState(['userName_AVA']),
+        // 其他 computed properties
+    },
     setup() {
+        const store = useStore();
         const stars = ref(0);
         const comments = ref(0);
-        const articles = ref([
+        const value = ref(new Date())
+        let articles = ref([
             {
                 title: '暴走奶昔的制作方法',
                 abst: '切、削、刨，一次解决',
@@ -202,14 +210,14 @@ export default {
                 time: '2024/6/15'
             },
         ]);
-        const srcAva = ref("https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png")
+        // const srcAva = ref("https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png")
 
         // const userInfo = ref("");
-        const userName = ref("暴走奶昔");
-        const userGender = ref(true);
-        const userEdu = ref("BUAA");
-        const userEmail = ref("1234567890@buaa.com");
-        const userInto = ref("暴走奶昔是一种奶昔，传说HelloKitty非常喜欢");
+        let userName = ref("暴走奶昔");
+        let userGender = ref(true);
+        let userEdu = ref("BUAA");
+        let userEmail = ref("1234567890@buaa.com");
+        let userInto = ref("暴走奶昔是一种奶昔，传说HelloKitty非常喜欢");
 
         let dialogVisible = ref(false);
 
@@ -222,9 +230,37 @@ export default {
         const oldPwd = ref();
         const newEmail = ref();
         const capN = ref();
+        const message = ElMessage;
         
         const getUserInfo = () => {
-            // TODO: if get failed, push back to login and send message
+            let id = window.sessionStorage.getItem("token");
+            console.log("###" + id);
+            axios.post('/user/findUser/id/', {
+                id: id
+            })
+                .then((response) => {
+                    if (response.data.code === 1) {
+                        // success
+                        userName.value = response.data.data.user.name;
+                        if (userName.value === null) {
+                            userName.value = '暴走奶昔';
+                        }
+                        userGender.value = response.data.data.user.gender === 1;
+                        userEdu.value = response.data.data.user.edu;
+                        userEmail.value = response.data.data.user.email;
+                        userInto.value = response.data.data.user.intro;
+                        stars.value = response.data.data.likeNum;
+                        comments.value = response.data.data.commentNum;
+                        articles = response.data.data.article;
+                    }
+                    else {
+                        // fail
+                        message({
+                            message: response.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
         };
 
         const openArticle = (row) => {
@@ -233,22 +269,84 @@ export default {
         };
 
         const updateBaseInfo = () => {
-            // TODO: update
+            axios.post('/user/update/info', {
+                id: window.sessionStorage.getItem("token"),
+                newNick: newNick.value,
+                newGender: newGender.value,
+                newEdu: newEdu.value,
+                newInto: newInto.value
+            })
+                .then((response) => {
+                    if (response.data.code === 1) {
+                        // success
+                        userName.value = newNick.value;
+                        store.state.userName_AVA = newNick.value;
+                        userGender.value = newGender.value;
+                        userEdu.value = newEdu.value;
+                        userInto.value = newInto.value;
+                    }
+                    else {
+                        // fail
+                        message({
+                            message: response.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
             dialogVisible = false;
         };
 
         const sendCap = (email) => {
-            email;
-            // TODO: add the api of send cap
+            axios.post('/user/emailSend', {
+                email: email
+            })
         };
 
         const updatePwd = () => {
             // TODO: update pwd
+            axios.post('/user/update/password', {
+                id: window.sessionStorage.getItem("token"),
+                oldPwd: oldPwd.value,
+                newPwd: newPwd.value
+            })
+                .then((response) => {
+                    if (response.data.code === 1) {
+                        // success
+                        dialogVisible = false;
+                        message({
+                            message: "密码修改成功，请重新登陆",
+                            type: 'success'
+                        });
+                        window.sessionStorage.setItem("token", 'null');
+                        store.state.userName_AVA = '';
+                        router.push('/login');
+                    }
+                    else {
+                        // fail
+                        message({
+                            message: response.data.msg,
+                            type: 'error'
+                        });
+                    }
+                })
             dialogVisible = false;
         };
 
         const updateEmail = () => {
           // TODO: update email
+            axios.post('', {
+                id: window.sessionStorage.getItem("token"),
+                capN: capN.value,
+                newEmail: newEmail.value
+            })
+                .then((response) => {
+                    if (response.data.code !== 1) {
+                        message({
+                            message: response.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
             dialogVisible = false;
         }
         
@@ -260,7 +358,7 @@ export default {
             stars,
             comments,
             articles,
-            srcAva,
+            // srcAva,
             userName,
             userGender,
             userEdu,
@@ -276,6 +374,7 @@ export default {
             oldPwd,
             newEmail,
             capN,
+            value,
             openArticle,
             updateBaseInfo,
             sendCap,
@@ -294,10 +393,12 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+
 }
 
 #body_UH {
     height: 100%;
+
 }
 
 #header_UH {

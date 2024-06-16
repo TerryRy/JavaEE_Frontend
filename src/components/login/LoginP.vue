@@ -78,26 +78,86 @@
 
 <script>
 import {onMounted, ref} from "vue";
+import axios from "axios";
+import {ElMessage} from "element-plus";
+import {mapState, useStore } from 'vuex';
+import router from "@/router";
 
 export default {
     name: "LoginP",
-
+    computed: {
+        ...mapState(['userName_AVA']),
+        // 其他 computed properties
+    },
     setup() {
         const userEmail = ref("");
         const cap = ref("");
         const pwd = ref("");
+        const message = ElMessage;
+        const store = useStore();
 
         const activeName = ref('first')
 
         const sendCap = () => {
-            // TODO: add the api of send cap
+            console.log(userEmail.value);
+            axios.post('/user/emailSend', {
+                email: userEmail.value
+            })
         }
 
         const login = () => {
-            // const useCap = (cap.value === 'first') ? 1 : 0;
-            // TODO: add the api of login with 3 params: userEmail, cap/pwd and useCap, and get the token
-            // const token = responce巴拉巴拉
-            // sessionStorage.setItem('token', token);
+            console.log(activeName.value);
+            if (activeName.value === 'first') {
+                // 验证码
+                axios.post('/user/register', {
+                    code: cap.value,
+                    email: userEmail.value,
+                    opt: 0
+                })
+                    .then((response) => {
+                        if (response.data.code === 1) {
+                            // success
+                            const token = response.data.data.id;
+                            window.sessionStorage.setItem('token', token);
+                            store.state.userName_AVA = response.data.data.user.name;
+                            if (store.state.userName_AVA === null) {
+                                store.state.userName_AVA = '暴走奶昔';
+                            }
+                            router.push('/userHome');
+                        }
+                        else {
+                            message({
+                                message: response.data.msg,
+                                type:'error'
+                            })
+                        }
+                    })
+            }
+            else {
+                // 密码
+                axios.post('/user/search', {
+                    email: userEmail.value,
+                    password: pwd.value
+                })
+                    .then((response) => {
+                        if (response.data.code === 1) {
+                            // success
+                            const token = response.data.data.id;
+                            window.sessionStorage.setItem('token', token);
+                            store.state.userName_AVA = response.data.data.user.name;
+                            if (store.state.userName_AVA === null) {
+                                store.state.userName_AVA = '暴走奶昔';
+                            }
+                            router.push('/userHome');
+                        }
+                        else {
+                            message({
+                                message: response.data.msg,
+                                type:'error'
+                            })
+                        }
+                    })
+            }
         }
 
         onMounted(() => {
