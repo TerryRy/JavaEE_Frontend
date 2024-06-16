@@ -20,7 +20,7 @@ export default {
 <style scoped>
 .navbar {
     width: 100%;
-    height: 6%;
+    height: 60px;
     background-color: #333;
     color: white;
     display: flex;
