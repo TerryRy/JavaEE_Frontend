@@ -3,13 +3,16 @@
     <div class="article-editor" style="height:700px;">
       <!-- 编辑器内容 -->
       <!-- <CherryEditor></CherryEditor> -->
-      <cherry-components ref="cherryComponents"
-                         :height="height"
-                         :editorModel="editorModel"
+      <cherry-components
+        ref="cherryComponents"
+        :height="height"
+        :editorModel="editorModel"
+        v-model="articleForm.content"
       ></cherry-components>
+
     </div>
     <div class="article-detail">
-      <div class="tag" style="margin-bottom: 30px">
+      <div class="tag" style="margin-bottom: 10px">
         文章标签
         <el-select
           v-model="select_value"
@@ -25,13 +28,29 @@
           />
         </el-select>
       </div>
+      <div class="title" style="display: flex;margin-bottom: 10px;">
+        <span>
+          文章标题
+        </span>
+        <span>
+          <el-input
+            v-model="title"
+            style="width: 240px;margin-left: 25px;"
+            :rows="2"
+            maxlength="100"
+            type="textarea"
+            show-word-limit
+            placeholder=""
+          />
+        </span>
+      </div>
       <div class="abstract" style="display: flex;">
         <span>
           文章摘要
         </span>
         <span>
           <el-input
-            v-model="textarea"
+            v-model="abstract"
             style="width: 500px;margin-left: 25px;"
             :rows="2"
             maxlength="200"
@@ -40,7 +59,6 @@
             placeholder="会在推荐、列表等场景外露，帮助读者快速了解内容"
           />
         </span>
-
       </div>
       <div class="submit" style="width: 100%;display: flex;justify-content: flex-end;">
         <el-button color="#F56C6C" :dark="isDark" size="large" style="color: white;" @click="saveArticle">发布博客</el-button>
@@ -73,7 +91,8 @@ export default {
         { value: 'op7', label: '面试' },
         { value: 'op8', label: '职场经验' },
       ],
-      textarea:'',
+      abstract:'',
+      title:'',
       articleForm: {
         title: '',
         content: '',
@@ -89,10 +108,21 @@ export default {
      * 保存文章
      */
      saveArticle() {
+      // 获取编辑器内容并赋值给 articleForm 的 content 属性
       this.articleForm.content = this.$refs.cherryComponents.cherryInstance.getValue();
-      axios.post('/api/blog/upload', this.articleForm)
+      console.log(this.articleForm.content);
+      // 构建请求体，确保包含所需的所有属性
+      const articleData = {
+        content: this.articleForm.content,
+        tag: this.select_value,  // 假设 select_value 存储了文章的标签
+        title: this.title,  // 需要确保 articleForm 包含 title
+        abstract: this.abstract  // 假设 textarea 存储了文章的摘要
+      };
+
+      // 发送 POST 请求
+      axios.post('/api/blog/upload', articleData)
         .then(response => {
-          if (response && response.data) {
+          if (response && response.data.code === 1) {
             this.$message.success('文章发布成功');
           } else {
             this.$message.error('文章发布失败');
@@ -134,7 +164,7 @@ html, body {
   min-height: 400px; /* 设置最小高度，根据需要调整 */
 }
 .article-detail{
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   padding: 30px;
   background-color: white;
   height:200px;

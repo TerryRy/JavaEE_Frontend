@@ -5,9 +5,9 @@
               <div class="author_section">
                 <div class="author1" style="display: flex;">
                   <img src="@/assets/logo.png" style="height:50px;width:50px;margin-right: 20px;">
-                  <router-link to="/OtherBlog" style="margin-bottom:20px;height:50px;padding: 15px;">{{ author_name }}</router-link>
+                  <router-link to="/OtherBlog" style="margin-bottom:20px;height:50px;padding: 15px;font-size: 24px;">{{ author_name }}</router-link>
                 </div>
-                <div class="author2" style="display: flex;padding-left: 20px;">
+                <div class="author2" style="display: flex;padding-left: 20px;font-size: 12px;">
                   <div style="margin-right: 30px;">
                     <div>发文量</div>
                     <div>&nbsp;&nbsp;{{ author_publication_count }}</div>
@@ -24,7 +24,7 @@
                 <el-divider border-style="dotted" style="margin:10px"/>
               </div>
               <div class="hot_section">
-                <div class="hot_title" style="padding: 15px;background-color: aqua;">热门文章</div>
+                <div class="hot_title" >热门文章</div>
                 <div class="passages">
                   <div v-for="passage in hot_passages.slice(0, 5)" :key="passage.id" class="passage" style="margin-bottom: 10px;">
                         <span style="font-weight: 500;">{{ passage.title }}</span>&nbsp;
@@ -55,9 +55,9 @@
                 </div>
                 <div class="passage_body">
                   <cherry-components
-                      ref="cherryComponents"
-                      :height="this.height"
-                      :editorModel="editorModel"
+                    :height="height"
+                    :editorModel="editorModel"
+                    :content="passage_content"
                   ></cherry-components>
                 </div>
               </div>
@@ -114,6 +114,7 @@
       },
       data(){
         return{
+          my_id:123,
           author_name:"zhangsan",
           author_id:1,
           editorModel: 'previewOnly',
@@ -125,6 +126,7 @@
           comment_count:10,
           like_count:19,
           unlike_count:1,
+          passage_content: '*这里是文字*_这里是文字_**这里是文字*****这里是文字***~~这里是文字~~',
           author_publication_count:77,
           author_comment_count:1987,
           author_like_count:9986,
@@ -148,27 +150,37 @@
       },
       methods:{
         getArticle() {
-          // const article_id = this.$route.params.id; // Assuming you pass article ID via route params
-          axios.get(`/api/blog/getArticle?id=${this.passage_id}`)
-            .then(response => {
-              const { data } = response.data; // Assuming the response structure is { code, msg, data }
-              if (response.data.code === 1) {
-                this.passage_title=data.title;
-                this.passage_tag=data.tag;
-                this.passage_time=data.time;
-                this.like_count=data.like;
-                this.unlike_count=data.unlike;
-                this.comment_count=data.comment;
-                this.getAuthor();
-              } else {
-                this.$message.error('获取文章失败'); // Handle error if needed
-              }
-            })
-            .catch(error => {
-              console.error('获取文章失败', error);
-              this.$message.error('获取文章失败'); // Handle error if needed
-            });
+          // 使用 this.$route.query 获取 query 参数中的文章 ID
+          const article_id = this.$route.query.id;
+          // 检查文章 ID 是否存在
+          if (!article_id) {
+            this.$message.error('文章 ID 不存在');
+            return;
+          }
+          // 发起请求获取文章内容
+          axios.get(`/api/blog/getArticle`, {
+            params: { id: article_id }
+          })
+          .then(response => {
+            const { data } = response.data; // 假设响应结构为 { code, msg, data }
+            if (response.data.code === 1) {
+              this.passage_title = data.title;
+              this.passage_tag = data.tag;
+              this.passage_time = data.time;
+              this.like_count = data.like;
+              this.unlike_count = data.unlike;
+              this.comment_count = data.comment;
+              this.getAuthor();
+            } else {
+              this.$message.error('获取文章失败');
+            }
+          })
+          .catch(error => {
+            console.error('获取文章失败', error);
+            this.$message.error('获取文章失败');
+          });
         },
+
         getAuthor() {
           axios.get(`/api/blog/getAuthor?id=${this.author_id}`)
             .then(response=>{
@@ -217,9 +229,13 @@
             })
         },
         putComment() {
-          const my_comment = this.textarea; // Assuming this.textarea is properly initialized
+          const commentData = {
+            content: this.textarea,
+            article_id: this.passage_id,  // 假设 select_value 存储了文章的标签
+            author_id: this.my_id,  // 需要确保 articleForm 包含 title
 
-          axios.post('/api/blog/comment', { comment: my_comment })
+          };
+          axios.post('/api/blog/comment', commentData)
             .then(response => {
               if (response && response.data && response.data.code === 1) {
                 this.$message.success('评论发布成功');
@@ -239,6 +255,7 @@
       mounted() {
         this.getArticle();
         this.getPopular();
+        this.getComments();
       },
   }
 </script>
@@ -254,6 +271,9 @@
 html, body {
   height: 100%;
 }
+#mainBody {
+    padding: 5px;
+}
 a{
   text-decoration: none; /* 去掉下划线 */
   color: inherit; /* 继承父元素颜色 */
@@ -262,16 +282,34 @@ a :hover{
   color: #007BFF; /* 鼠标悬停时颜色 */
 }
 /* 设置 flex 布局 */
-.body {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+body, .body {
+  margin: 0;
+  padding: 0;
 }
 
 /* main-container 样式 */
 .main-container {
   flex: 1; /* 使 main-container 占据剩余空间 */
   padding: 20px 100px; /* 设置左右两侧的间距 */
+
+  margin: 0; /* 确保没有 margin */
+
+  background:
+    linear-gradient(324deg, #232927 4%,   transparent 4%) -70px 43px,
+    linear-gradient( 36deg, #232927 4%,   transparent 4%) 30px 43px,
+    linear-gradient( 72deg, #e3d7bf 8.5%, transparent 8.5%) 30px 43px,
+    linear-gradient(288deg, #e3d7bf 8.5%, transparent 8.5%) -70px 43px,
+    linear-gradient(216deg, #e3d7bf 7.5%, transparent 7.5%) -70px 23px,
+    linear-gradient(144deg, #e3d7bf 7.5%, transparent 7.5%) 30px 23px,
+
+    linear-gradient(324deg, #232927 4%,   transparent 4%) -20px 93px,
+    linear-gradient( 36deg, #232927 4%,   transparent 4%) 80px 93px,
+    linear-gradient( 72deg, #e3d7bf 8.5%, transparent 8.5%) 80px 93px,
+    linear-gradient(288deg, #e3d7bf 8.5%, transparent 8.5%) -20px 93px,
+    linear-gradient(216deg, #e3d7bf 7.5%, transparent 7.5%) -20px 73px,
+    linear-gradient(144deg, #e3d7bf 7.5%, transparent 7.5%) 80px 73px;
+    background-color: #232927;
+    background-size: 100px 100px;
   
 }
 
@@ -281,6 +319,7 @@ a :hover{
   justify-content: space-between; /* 在子元素之间留空 */
   height: calc(100vh - 110px); /* 计算高度以减去 header 和 footer 的高度 */
   overflow: scroll;
+  margin:0;
 
 }
 
@@ -292,13 +331,17 @@ a :hover{
 .author_section{
   margin-bottom: 30px;
   padding: 20px;
-  background-color:azure;
+  background-color:rgb(239, 247, 247);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
 }
 .hot_section{
   min-height:100px;
-  background-color:azure;
+  background-color:rgb(239, 247, 247);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+}
+.hot_title{
+  padding: 15px;
+  background-color: rgb(190, 220, 220);
 }
 .passages{
   padding: 15px;
@@ -306,7 +349,7 @@ a :hover{
 }
 .detail {
   flex: 0 0 70%; /* 固定宽度为70% */
-  background-color: azure;
+  background-color:rgb(239, 247, 247);
   min-height: 100%; /* 高度与 main 一致 */
   /*box-shadow: 0 8px 8px rgba(0, 0, 0, 0.5); /* 添加阴影效果 */
 }
@@ -325,14 +368,15 @@ a :hover{
 .passage_body{
   width:100%;
   padding:30px;
-  background-color: azure;
+  background-color:rgb(239, 247, 247);
   min-height:500px;
 
 }
 .comment_section{
+  margin-top: 20px;
   width:100%;
   min-height:200px;
-  background-color:aliceblue;
+  background-color:rgb(190, 220, 220);
 
 }
 .your_comment{

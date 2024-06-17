@@ -33,8 +33,8 @@
       </el-menu>
     </div>
     <div class="main">
-      <el-card style="width: 800px;height:1000px" >
-        <div v-for="passage in passages" :key="passage.id" class="text item" style="margin-bottom: 15px;box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);padding: 10px;">
+      <el-card style="width: 800px;" >
+        <div v-for="passage in passages" :key="passage.id" class="text item" style="margin-bottom: 15px;box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);padding: 10px;">
           <div style="font-size: 18px;font-weight: 600;margin-bottom: 10px;">{{ passage.title.slice(0,50) }}</div>
           <div style="margin-bottom: 10px;color: gray;">
             {{ passage.abstract.slice(0,50) }}
@@ -50,7 +50,6 @@
             </span>
           </div>
         </div>
-        <el-pagination layout="prev, pager, next" :total="50" />
       </el-card>
     </div>
     <div class="right_aside">
@@ -123,6 +122,20 @@ export default {
       like_count: 18,
       tag: "前端",
       abstract: "本指南详细介绍了Ant Design的常用组件和最佳实践，提升开发效率。"
+    },
+    {
+      title: "ECharts可视化教程",
+      author_name: "孙七",
+      like_count: 20,
+      tag: "前端",
+      abstract: "通过实例讲解ECharts的使用方法，帮助开发者快速掌握数据可视化技术。"
+    },
+    {
+      title: "ECharts可视化教程",
+      author_name: "孙七",
+      like_count: 20,
+      tag: "前端",
+      abstract: "通过实例讲解ECharts的使用方法，帮助开发者快速掌握数据可视化技术。"
     },
     {
       title: "ECharts可视化教程",
@@ -211,15 +224,22 @@ export default {
 html, body {
   height: 100%;
 }
-
+#mainBody{
+  margin: 0;
+  position:fixed;
+  top:7%;
+  height:94%;
+  overflow: scroll;
+}
 /* Body容器样式 */
 .body {
   display: flex;
   justify-content: space-between;
   padding: 50px; /* 页面两侧留空 */
+  padding-top: 30px;
   gap: 20px; /* 左中右间隙 */
   min-height: 100vh;
-  background-color: #f0f0f0; /* 背景颜色，可根据需求更改 */
+  background-color: #e3e2e2; /* 背景颜色，可根据需求更改 */
 }
 
 /* Left Aside样式 */
@@ -233,6 +253,7 @@ html, body {
 /* Main内容样式 */
 .main {
   flex: 8;
+
   /* background-color: #ffffff; /* 背景颜色，可根据需求更改 */
   /*padding: 10px; */
 }
@@ -248,13 +269,14 @@ html, body {
   width:100%;
   height:100px;
   padding: 20px;
-  background-color: #ffffff;
+  background-color: hsl(184, 54%, 78%);
+
 }
 .hot{
   margin-top: 30px;
   width:100%;
   min-height:300px;
   padding: 20px;
-  background-color: #ffffff;
+  background-color: hsl(184, 54%, 78%);
 }
 </style>
