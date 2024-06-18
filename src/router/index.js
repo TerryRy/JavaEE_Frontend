@@ -5,8 +5,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 const routes = [
     {
         path: '/',
-        name: 'HelloWorld',
-        component: () => import('@/components/HelloWorld.vue')
+        name: 'HomePage',
+        component: () => import('@/views/HomePage.vue')
     },
     {
         path: '/login',
@@ -18,6 +18,21 @@ const routes = [
         name: 'UserHome',
         component: () => import('@/components/UserHome.vue')
     },
+    {
+        path: '/blogDetail/:id',
+        name: 'BlogDetail',
+        component: () => import('@/views/Blog/BlogDetail.vue')
+    },
+    {
+        path: '/blogEditor',
+        name: 'BlogEditor',
+        component: () => import('@/views/Blog/BlogEditor.vue')
+    },
+    {
+        path: '/other',
+        name: 'OtherPage',
+        component: () =>import('@/components/HelloWorld.vue')
+    }
 ];
 
 const router = createRouter({

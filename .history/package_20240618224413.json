@@ -8,7 +8,11 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "axios": "^1.7.2",
+    "core-js": "^3.8.3",
+    "element-plus": "^2.7.4",
+=======
     "@element-plus/icons-vue": "^2.3.1",
     "cherry-markdown": "^0.8.42",
     "core-js": "^3.8.3",
@@ -16,7 +20,7 @@
     "element-plus": "^2.7.5",
     "sass": "^1.77.5",
     "sass-loader": "^14.2.1",
-    "element-plus": "^2.7.4",
+>>>>>>> 2214d9e3fd03132d58a0889fc0cc991db80abb0f
     "vue": "^3.2.13",
     "vue-router": "^4.3.2",
     "vuex": "^4.1.0"
