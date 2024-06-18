@@ -71,6 +71,7 @@
 <script>
 import CherryComponents from "@/components/Cherry/CherryComponents";
 import axios from 'axios'
+import router from '@/router';
 
 export default {
   name: "EditorIndex",
@@ -124,9 +125,11 @@ export default {
         .then(response => {
           if (response && response.data.code === 1) {
             this.$message.success('文章发布成功');
+            router.go(-1);
           } else {
             this.$message.error('文章发布失败');
           }
+
         })
         .catch(error => {
           console.error('文章发布失败', error);

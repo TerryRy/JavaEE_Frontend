@@ -188,7 +188,9 @@ export default {
     },
     getArticles() {
       const tag = this.numberToTag(this.active_index);
-      axios.get(`/api/blog/searchBlog?tag=${tag}`)
+      axios.get(`/api/blog/getComments`, {
+            params: { tag: tag }
+          })
             .then(response => {
               if (response.data.code === 1) {
                 this.passages = response.data;

@@ -19,7 +19,7 @@ const routes = [
         component: () => import('@/components/login/RegisterP.vue')
     },
     {
-        path: '/blogDetail',
+        path: '/blogDetail/:id',
         name: 'BlogDetail',
         component: () => import('@/views/Blog/BlogDetail.vue')
     },

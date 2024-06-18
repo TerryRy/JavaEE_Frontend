@@ -150,16 +150,15 @@
       },
       methods:{
         getArticle() {
-          // 使用 this.$route.query 获取 query 参数中的文章 ID
-          const article_id = this.$route.query.id;
           // 检查文章 ID 是否存在
-          if (!article_id) {
+          if (!this.article_id) {
             this.$message.error('文章 ID 不存在');
             return;
           }
+          console.log("id"+this.article_id);
           // 发起请求获取文章内容
           axios.get(`/api/blog/getArticle`, {
-            params: { id: article_id }
+            params: { id: this.article_id }
           })
           .then(response => {
             const { data } = response.data; // 假设响应结构为 { code, msg, data }
@@ -182,7 +181,9 @@
         },
 
         getAuthor() {
-          axios.get(`/api/blog/getAuthor?id=${this.author_id}`)
+          axios.get(`/api/blog/getAuthor`, {
+            params: { id: this.author_id }
+          })
             .then(response=>{
               const { data } = response.data;
               if (response.data.code === 1) {
@@ -237,7 +238,7 @@
           };
           axios.post('/api/blog/comment', commentData)
             .then(response => {
-              if (response && response.data && response.data.code === 1) {
+              if (response &&  response.code === 1) {
                 this.$message.success('评论发布成功');
                 // Optionally, reset the textarea or perform other actions upon success
                 this.textarea = ''; // Reset textarea after successful comment submission
@@ -253,6 +254,7 @@
 
       },
       mounted() {
+        this.article_id = this.$route.params.id;
         this.getArticle();
         this.getPopular();
         this.getComments();
