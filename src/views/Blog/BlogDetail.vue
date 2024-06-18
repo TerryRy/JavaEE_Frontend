@@ -203,7 +203,7 @@
         getPopular() {
           axios.get(`/api/blog/getPopular`)
             .then(response=>{
-              if (response.code === 1) {
+              if (!response && response.code === 1) {
                 this.hot_passages = response.data;
               } else {
                 this.$message.error('获取top失败'); // Handle error if needed
@@ -215,7 +215,9 @@
             })
         },
         getComments() {
-          axios.get(`/api/blog/getComments?id=${this.passage_id}`)
+          axios.get(`/api/blog/getComments`, {
+            params: { id: this.article_id }
+          })
             .then(response=>{
               const { data } = response.data;
               if (response.data.code === 1) {
@@ -242,6 +244,7 @@
                 this.$message.success('评论发布成功');
                 // Optionally, reset the textarea or perform other actions upon success
                 this.textarea = ''; // Reset textarea after successful comment submission
+                this.getComments();
               } else {
                 this.$message.error('评论发布失败');
               }

@@ -35,7 +35,11 @@
     <div class="main">
       <el-card style="width: 800px;" >
         <div v-for="passage in passages" :key="passage.id" class="text item" style="margin-bottom: 15px;box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);padding: 10px;">
-          <div style="font-size: 18px;font-weight: 600;margin-bottom: 10px;">{{ passage.title.slice(0,50) }}</div>
+          <router-link :to="{ name: 'BlogDetail', params: { id: passage.id } }" style="text-decoration: none; color: inherit;">
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+              {{ passage.title.slice(0, 50) }}
+            </div>
+          </router-link>
           <div style="margin-bottom: 10px;color: gray;">
             {{ passage.abstract.slice(0,50) }}
             <span v-if="passage.abstract.length>50">...</span>
@@ -63,10 +67,13 @@
         <div class="hot_section">
                 <div class="passages">
                   <div v-for="passage in hot_passages.slice(0, 5)" :key="passage.id" class="passage" style="margin-bottom: 10px;">
-                        <span style="font-weight: 500;">{{ passage.title.slice(0,30) }}</span>&nbsp;
-                        <el-icon style="color:gray;font-size: 14px;"><User /></el-icon>
-                        <span style="font-weight: 300;color: gray;font-size: 14px;">{{ passage.like_count }} </span>
-                    </div>
+                  <!-- 使用 <router-link> 组件包裹标题 -->
+                  <router-link :to="{ name: 'BlogDetail', params: { id: passage.id } }" style="text-decoration: none; color: inherit;">
+                    <span style="font-weight: 500;">{{ passage.title.slice(0, 30) }}</span>&nbsp;
+                    <el-icon style="color: gray; font-size: 14px;"><User /></el-icon>
+                    <span style="font-weight: 300; color: gray; font-size: 14px;">{{ passage.like_count }}</span>
+                  </router-link>
+                </div>
                 </div>
         </div>
       </div>
@@ -96,6 +103,7 @@ export default {
       ],
       passages: [
     {
+      id:1,
       title: "谷粒商城实战(033 业务-秒杀功能4-高并发问题解决方案)",
       author_name: "张三",
       like_count: 12,
@@ -103,6 +111,7 @@ export default {
       abstract: "Hi，好久不见，最近植物大战僵尸杂交版蛮火的。那今天苏音整理给大家三端的植物大战僵尸杂交版。"
     },
     {
+      id:2,
       title: "React入门与实战",
       author_name: "李四",
       like_count: 25,
@@ -110,6 +119,7 @@ export default {
       abstract: "本文介绍了React的基础知识和实战技巧，适合初学者和有一定经验的开发者。"
     },
     {
+      id:3,
       title: "Vue3新特性详解",
       author_name: "王五",
       like_count: 30,
@@ -117,6 +127,7 @@ export default {
       abstract: "本文深入探讨了Vue3的新特性和使用方法，帮助开发者快速上手新版本。"
     },
     {
+      id:4,
       title: "Ant Design实用指南",
       author_name: "赵六",
       like_count: 18,
@@ -124,6 +135,7 @@ export default {
       abstract: "本指南详细介绍了Ant Design的常用组件和最佳实践，提升开发效率。"
     },
     {
+      id:5,
       title: "ECharts可视化教程",
       author_name: "孙七",
       like_count: 20,
@@ -131,6 +143,7 @@ export default {
       abstract: "通过实例讲解ECharts的使用方法，帮助开发者快速掌握数据可视化技术。"
     },
     {
+      id:6,
       title: "ECharts可视化教程",
       author_name: "孙七",
       like_count: 20,
@@ -138,6 +151,7 @@ export default {
       abstract: "通过实例讲解ECharts的使用方法，帮助开发者快速掌握数据可视化技术。"
     },
     {
+      id:7,
       title: "ECharts可视化教程",
       author_name: "孙七",
       like_count: 20,
@@ -188,7 +202,7 @@ export default {
     },
     getArticles() {
       const tag = this.numberToTag(this.active_index);
-      axios.get(`/api/blog/getComments`, {
+      axios.get(`/api/blog/searchBlog`, {
             params: { tag: tag }
           })
             .then(response => {
